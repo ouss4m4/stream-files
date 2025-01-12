@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { processCsv } from '../lib/processFileUpload';
-
+import { Worker } from 'worker_threads';
+import { join } from 'path';
 export class UploadController {
   public static async upload(req: Request, res: Response): Promise<void> {
     if (!req.file) {
@@ -8,8 +9,12 @@ export class UploadController {
       return;
     }
     const filePath = req.file.path;
-    // TODO: spawn a worker to process this process
-    const response = await processCsv(filePath, res);
+    res.header('Content-Type', 'application/json');
+    let cb = (state: string) => {
+      res.write(state);
+    };
+    await processCsv(filePath, cb);
+    res.end();
   }
 
   public static async uploadWorker(req: Request, res: Response): Promise<void> {
@@ -19,7 +24,23 @@ export class UploadController {
     }
 
     const filePath = req.file.path;
-    // TODO: spawn a worker to process this process
-    const response = await processCsv(filePath, res);
+    const worker = new Worker(
+      join(__dirname, '..', 'workers/processCsvUpload.worker.js')
+    );
+    worker.postMessage({ filePath });
+    worker.once('message', (message) => {
+      console.log(message);
+      res.write(JSON.stringify(message));
+      res.end(); // Ensure the response ends here
+    });
+
+    worker.on('error', (error) => {
+      console.error(error);
+    });
+
+    worker.on('exit', (exitCode) => {
+      console.log(`It exited with code ${exitCode}`);
+      res.end();
+    });
   }
 }
