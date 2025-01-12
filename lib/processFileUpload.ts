@@ -1,7 +1,7 @@
 import { Response } from 'express';
-import { streamCsvFromDisk } from './streamCsvFromDIsk.service';
-import { downloadImages } from './downloadImage.service';
-import { processBatchOfDownloadPromises } from './processBatchOfPromises.service';
+import { streamCsvFromDisk } from './streamCsvFromDisk';
+import { downloadImages } from './downloadImage';
+import { processBatchOfDownloadPromises } from './processBatchOfPromises';
 
 export const processCsv = async (
   filePath: string,

@@ -1,4 +1,4 @@
-import { processBatchOfDownloadPromises } from '../services/processBatchOfPromises.service';
+import { processBatchOfDownloadPromises } from '../lib/processBatchOfPromises';
 
 describe('processBatchOfPromises', () => {
   it('Should await promises, and return proper result', async () => {

@@ -1,9 +1,8 @@
-import { Readable } from 'stream';
 import {
   testUrlRegex,
   downloadImage,
   downloadImages,
-} from '../services/downloadImage.service';
+} from '../lib/downloadImage';
 import { createWriteStream } from 'fs';
 import { pipeline } from 'stream/promises';
 
@@ -98,7 +97,7 @@ describe('downloadImage.service', function () {
     };
 
     const downloadImageMock = jest.spyOn(
-      require('../services/downloadImage.service'),
+      require('../lib/downloadImage'),
       'downloadImage'
     );
     downloadImageMock
