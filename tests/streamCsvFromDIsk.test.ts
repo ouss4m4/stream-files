@@ -1,5 +1,5 @@
 import { Readable } from 'stream';
-import { streamCsvFromDisk } from '../services/streamCsvFromDIsk.service';
+import { streamCsvFromDisk } from '../lib/streamCsvFromDisk';
 import { createReadStream } from 'fs';
 
 jest.mock('fs', () => ({
