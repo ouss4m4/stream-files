@@ -22,16 +22,15 @@ export class UploadController {
       res.status(400).send('No files were uploaded.');
       return;
     }
-
+    res.header('Content-Type', 'application/json');
     const filePath = req.file.path;
     const worker = new Worker(
       join(__dirname, '..', 'workers/processCsvUpload.worker.js')
     );
+
     worker.postMessage({ filePath });
-    worker.once('message', (message) => {
-      console.log(message);
-      res.write(JSON.stringify(message));
-      res.end(); // Ensure the response ends here
+    worker.on('message', (message) => {
+      res.write(message);
     });
 
     worker.on('error', (error) => {
@@ -39,8 +38,12 @@ export class UploadController {
     });
 
     worker.on('exit', (exitCode) => {
-      console.log(`It exited with code ${exitCode}`);
-      res.end();
+      if (exitCode != 0) {
+        console.error(`It exited with code ${exitCode}`);
+        res.end('error processing csv' + exitCode);
+      } else {
+        res.end();
+      }
     });
   }
 }
