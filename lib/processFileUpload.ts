@@ -5,7 +5,7 @@ import { processBatchOfDownloadPromises } from './processBatchOfPromises';
 
 export const processCsv = async (
   filePath: string,
-  res: Response
+  cb: (state: string) => void
 ): Promise<void> => {
   // Start a csv read and streams
   const csvStream = streamCsvFromDisk(filePath);
@@ -13,8 +13,8 @@ export const processCsv = async (
   let success = 0;
 
   // Send initial data to client
-  res.header('Content-Type', 'application/json');
-  res.write(generateResponseObject(success, errorsFetching));
+
+  cb(generateResponseObject(success, errorsFetching));
 
   let batch: Promise<any>[] = [];
   const batchsize = 10;
@@ -29,7 +29,7 @@ export const processCsv = async (
         await processBatchOfDownloadPromises(batch);
       success += batchSuccess;
       errorsFetching = errorsFetching.concat(batchErrors);
-      res.write(generateResponseObject(success, errorsFetching));
+      cb(generateResponseObject(success, errorsFetching));
       batch = [];
     }
   }
@@ -40,11 +40,9 @@ export const processCsv = async (
       await processBatchOfDownloadPromises(batch);
     success += batchSuccess;
     errorsFetching = errorsFetching.concat(batchErrors);
-    res.write(generateResponseObject(success, errorsFetching));
+    cb(generateResponseObject(success, errorsFetching));
     batch = [];
   }
-
-  res.end(generateResponseObject(success, errorsFetching));
 };
 
 function generateResponseObject(success: number, errors: string[]): string {
