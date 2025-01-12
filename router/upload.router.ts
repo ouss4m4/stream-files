@@ -1,8 +1,9 @@
 import { Request, Router } from 'express';
 import { UploadController } from '../controllers/upload.controller';
+import { fileUpload } from '../middleware/fileUpload.middleware';
 
 const uploadRouter = Router();
 
-uploadRouter.post('/', UploadController.upload);
+uploadRouter.post('/', fileUpload.single('file'), UploadController.upload);
 
 export { uploadRouter };
