@@ -1,7 +1,4 @@
 import { Request, Response } from 'express';
-import { streamCsvFromDisk } from '../services/streamCsvFromDIsk.service';
-import { downloadImages } from '../services/downloadImage.service';
-import { CsvRow, UploadResponse } from '../shared/types';
 import { processCsv } from '../services/processFileUpload.service';
 
 export class UploadController {
