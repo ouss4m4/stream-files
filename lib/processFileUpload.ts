@@ -1,4 +1,3 @@
-import { Response } from 'express';
 import { streamCsvFromDisk } from './streamCsvFromDisk';
 import { downloadImages } from './downloadImage';
 import { processBatchOfDownloadPromises } from './processBatchOfPromises';
