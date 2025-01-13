@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="">
+    <h1 class="mt-4 text-3xl text-center font-bold">Product Upload</h1>
+
+    <div class="flex items-center mt-6 flex-col">
+      <input type="file" name="items" id="itemsInput" />
+      <span class="text-xs mt-2"
+        >Upload a csv file with products and images</span
+      >
+
+      <button
+        type="button"
+        class="button border shadow p-2 rounded mt-1"
+        id="uploadBtn"
+      >
+        Upload
+      </button>
+    </div>
+
+    <div id="cards" class="flex gap-4 row-wrap max-w-screen"></div>
+
+    <script>
+      let fileInput = document.getElementById('itemsInput');
+      let uploadBtn = document.getElementById('uploadBtn');
+      let file = null;
+      fileInput.addEventListener('change', (e) => {
+        file = e.target.files[0];
+      });
+      const handleSumbit = (e) => {
+        e.preventDefault();
+        if (!file) {
+          return;
+        }
+        // call the uploadCsvStatusCard
+        uploadCsvStatusCard(file);
+        fileInput.value = '';
+      };
+
+      uploadBtn.addEventListener('click', handleSumbit);
+
+      const uploadCsvStatusCard = async (file) => {
+        console.log(file);
+        let card = document.createElement('div');
+        card.className = 'py-2 px-4 rounded shadow max-w-md';
+        let header = document.createElement('div');
+        header.className = 'flex flex-col gap-4';
+        let title = document.createElement('h2');
+        // title = file.
+        title.textContent = `<p> ${file.name} </p>`;
+        header.append(title);
+        card.append(header);
+
+        let form = new FormData();
+        form.append('file', file);
+        let progress = document.createElement('p');
+        progress.textContent = 'Processing...';
+        header.append(progress);
+        document.getElementById('cards').append(card);
+        try {
+          let response = await fetch('http://localhost:3000/upload', {
+            method: 'POST',
+            body: form,
+          });
+          if (!response.ok || !response.body) {
+            throw new Error('failed to fetch');
+          }
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let streamDone = false;
+          while (!streamDone) {
+            const { value, done } = await reader.read();
+            streamDone = done;
+
+            if (value) {
+              let text = decoder.decode(value, { stream: true });
+              progress.textContent = text;
+            }
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      };
+    </script>
+  </body>
+</html>

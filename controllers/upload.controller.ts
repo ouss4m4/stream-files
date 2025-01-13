@@ -10,6 +10,7 @@ export class UploadController {
     }
     const filePath = req.file.path;
     res.header('Content-Type', 'application/json');
+    console.log(process.pid);
     let cb = (state: string) => {
       res.write(state);
     };
@@ -22,6 +23,8 @@ export class UploadController {
       res.status(400).send('No files were uploaded.');
       return;
     }
+    console.log(process.pid);
+
     res.header('Content-Type', 'application/json');
     const filePath = req.file.path;
     const worker = new Worker(
